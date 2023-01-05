@@ -1,0 +1,14 @@
+java_test(
+    name = "InMemoryKeyValueStoreTest",
+    srcs = [
+        "InMemoryKeyValueStoreTest.java",
+    ],
+    deps = [
+        "//java/com/rockwotj/syllabusdb/core/bytes",
+        "//java/com/rockwotj/syllabusdb/kv/api",
+        "//java/com/rockwotj/syllabusdb/kv/memory",
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
+)

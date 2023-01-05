@@ -1,0 +1,10 @@
+### Bazel ###
+bazel-*
+
+### IntelliJ IDEA ###
+.idea
+*.iml
+.ijwb
+
+### Mac OS ###
+.DS_Store

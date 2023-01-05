@@ -1,0 +1,17 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+java_library(
+    name = "api",
+    srcs = glob(
+        ["*.java"],
+        exclude = ["*Test.java"],
+    ),
+    deps = [
+        "//java/com/rockwotj/syllabusdb/core/bytes",
+        "@maven//:com_google_code_findbugs_jsr305",
+    ],
+)
