@@ -1,0 +1,19 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+java_library(
+    name = "converter",
+    srcs = glob(
+        ["*.java"],
+        exclude = ["*Test.java"],
+    ),
+    deps = [
+        "//java/com/rockwotj/syllabusdb/core/bytes",
+        "//java/com/rockwotj/syllabusdb/core/document",
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:com_google_code_gson_gson",
+    ],
+)

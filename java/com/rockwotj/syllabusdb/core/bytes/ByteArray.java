@@ -1,5 +1,7 @@
 package com.rockwotj.syllabusdb.core.bytes;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
@@ -34,6 +36,14 @@ public class ByteArray implements Comparable<ByteArray> {
 
   public byte get(int i) {
     return this.bytes[i];
+  }
+
+  public String toUtf8() {
+    return new String(bytes, StandardCharsets.UTF_8);
+  }
+
+  public InputStream toInputStream() {
+    return new ByteArrayInputStream(bytes);
   }
 
   @Override
