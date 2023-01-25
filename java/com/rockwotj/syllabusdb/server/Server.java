@@ -5,7 +5,7 @@ import io.javalin.http.Context;
 import io.javalin.http.ServiceUnavailableResponse;
 
 /** The server! */
-public class Server implements AutoCloseable {
+public final class Server implements AutoCloseable {
 
   private final Javalin app;
 
@@ -21,13 +21,13 @@ public class Server implements AutoCloseable {
     return new Server();
   }
 
-  public void start(int port) {
-    this.app.start(port);
-  }
-
   public static void main(String[] args) {
     var server = Server.create();
     server.start(3000);
+  }
+
+  public void start(int port) {
+    this.app.start(port);
   }
 
   private void lookup(Context context) {

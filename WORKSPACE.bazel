@@ -31,6 +31,7 @@ maven_install(
         "junit:junit:4.13.2",
         "org.slf4j:slf4j-simple:2.0.6",
     ],
+    fetch_sources = True,
     maven_install_json = "@//:maven_install.json",
     repositories = [
         "https://maven.google.com",

@@ -1,0 +1,19 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+java_test(
+    name = "IndexTest",
+    srcs = ["IndexTest.java"],
+    deps = [
+        "//java/com/rockwotj/syllabusdb/core/bytes",
+        "//java/com/rockwotj/syllabusdb/core/document",
+        "//java/com/rockwotj/syllabusdb/core/index",
+        "//javatests/com/rockwotj/syllabusdb/core/document/testdata",
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
+)

@@ -5,13 +5,14 @@ package(
 )
 
 java_library(
-    name = "document",
+    name = "index",
     srcs = glob(
         ["*.java"],
         exclude = ["*Test.java"],
     ),
     deps = [
-        "//java/com/rockwotj/syllabusdb/core/util/compare",
+        "//java/com/rockwotj/syllabusdb/core/bytes",
+        "//java/com/rockwotj/syllabusdb/core/document",
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:com_google_guava_guava",
     ],

@@ -31,21 +31,6 @@ public interface KeyValueStore {
     write(List.of(batch));
   }
 
-  /** The record for a write. If value is null, it's a delete operation. */
-  record Write(@Nonnull ByteArray key, @Nullable ByteArray value) {
-    public Write {
-      Objects.requireNonNull(key);
-    }
-
-    public static Write put(@Nonnull ByteArray key, @Nonnull ByteArray value) {
-      return new Write(key, value);
-    }
-
-    public static Write delete(@Nonnull ByteArray key) {
-      return new Write(key, null);
-    }
-  }
-
   /**
    * A bidirectional iterator over a key/value store.
    *
@@ -99,5 +84,20 @@ public interface KeyValueStore {
 
     @Override
     public void close();
+  }
+
+  /** The record for a write. If value is null, it's a delete operation. */
+  record Write(@Nonnull ByteArray key, @Nullable ByteArray value) {
+    public Write {
+      Objects.requireNonNull(key);
+    }
+
+    public static Write put(@Nonnull ByteArray key, @Nonnull ByteArray value) {
+      return new Write(key, value);
+    }
+
+    public static Write delete(@Nonnull ByteArray key) {
+      return new Write(key, null);
+    }
   }
 }

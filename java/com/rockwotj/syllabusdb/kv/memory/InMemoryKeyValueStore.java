@@ -2,12 +2,15 @@ package com.rockwotj.syllabusdb.kv.memory;
 
 import com.rockwotj.syllabusdb.core.bytes.ByteArray;
 import com.rockwotj.syllabusdb.kv.api.KeyValueStore;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** A simple copy on write in-memory key value store giving us the semantics we need. */
-public class InMemoryKeyValueStore implements KeyValueStore {
+public final class InMemoryKeyValueStore implements KeyValueStore {
   @Nonnull private NavigableMap<ByteArray, ByteArray> data = new TreeMap<>();
 
   @Override
@@ -29,7 +32,7 @@ public class InMemoryKeyValueStore implements KeyValueStore {
   }
 }
 
-class InMemoryCursor implements KeyValueStore.Cursor {
+final class InMemoryCursor implements KeyValueStore.Cursor {
   @Nonnull private final NavigableMap<ByteArray, ByteArray> data;
 
   @Nullable private Map.Entry<ByteArray, ByteArray> current;
