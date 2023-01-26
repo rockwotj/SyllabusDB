@@ -13,6 +13,19 @@ public record Document(
     this(path.id(), path.collection(), fields);
   }
 
+  public Value get(FieldPath path) {
+    var segmentIt = path.segments().iterator();
+    // Never empty
+    var v = fields.get(segmentIt.next());
+    while (v != null && segmentIt.hasNext()) {
+      if (v.type() != Value.Type.Object) {
+        return null;
+      }
+      v = v.asObject().get(segmentIt.next());
+    }
+    return v;
+  }
+
   public Path path() {
     return new Path(collection, id);
   }

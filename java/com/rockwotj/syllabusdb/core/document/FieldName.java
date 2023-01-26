@@ -4,7 +4,7 @@ import com.rockwotj.syllabusdb.core.util.compare.CodepointComparator;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
-/** A name within document. */
+/** A name within a document. */
 public record FieldName(@Nonnull String raw) implements Comparable<FieldName> {
   private static final Pattern VALID_ID_REGEX = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*$");
 

@@ -8,7 +8,12 @@ package com.rockwotj.syllabusdb.core.index;
  * to itself. This leaves us with four symbols left: 0x00, 0xFF, MIN_VALUE, MAX_VALUE. We encode
  * them as the following sequences:
  *
- * <p>MIN_VALUE -> 0x00 0x00 0x00 -> 0x00 0xFF 0xFF -> 0xFF 0x01 MAX_VALUE -> 0xFF 0xFF
+ * <ul>
+ *   <li>MIN_VALUE -> 0x00 0x00
+ *   <li>0x00 -> 0x00 0xFF
+ *   <li>0xFF -> 0xFF 0x01
+ *   <li>MAX_VALUE -> 0xFF 0xFF
+ * </ul>
  *
  * <p>There are more 2 byte sequences we could encode with the 0x00 and 0xFF prefixes, but those
  * slots are unused.
@@ -18,8 +23,10 @@ package com.rockwotj.syllabusdb.core.index;
  *
  * <p>See the following for the original implementation in C++
  *
- * <p>https://github.com/firebase/firebase-ios-sdk/blob/4171a3b5/Firestore/core/src/util/ordered_code.h
- * https://github.com/firebase/firebase-ios-sdk/blob/4171a3b5/Firestore/core/src/util/ordered_code.cc
+ * <p><a
+ * href="https://github.com/firebase/firebase-ios-sdk/blob/4171a3b5/Firestore/core/src/util/ordered_code.h">ordered_code.h</a>
+ * <a
+ * href="https://github.com/firebase/firebase-ios-sdk/blob/4171a3b5/Firestore/core/src/util/ordered_code.cc">ordered_code.cc</a>
  */
 final class Constants {
 

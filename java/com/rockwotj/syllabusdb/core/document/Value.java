@@ -2,11 +2,14 @@ package com.rockwotj.syllabusdb.core.document;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.rockwotj.syllabusdb.core.util.compare.CodepointComparator;
+import com.rockwotj.syllabusdb.core.util.compare.LexicographicalComparator;
 import com.rockwotj.syllabusdb.core.util.compare.TotalOrderDoubleComparator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 import javax.annotation.Nonnull;
@@ -23,12 +26,17 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class Value implements Comparable<Value> {
 
-  public static Value NULL = new Value(null);
-  public static Value FALSE = new Value(Boolean.FALSE);
-  public static Value TRUE = new Value(Boolean.TRUE);
-  public static Value NAN = new Value(Double.NaN);
-  public static Value EMPTY_LIST = new Value(List.of());
-  public static Value EMPTY_OBJECT = new Value(ImmutableSortedMap.of());
+  private final static Comparator<Iterable<Map.Entry<FieldName, Value>>> OBJECT_COMPARATOR =
+          LexicographicalComparator.create(
+                  Map.Entry.<FieldName, Value>comparingByKey().thenComparing(Map.Entry.comparingByValue())
+          );
+
+  public final static Value NULL = new Value(null);
+  public final static Value FALSE = new Value(Boolean.FALSE);
+  public final static Value TRUE = new Value(Boolean.TRUE);
+  public final static Value NAN = new Value(Double.NaN);
+  public final static Value EMPTY_LIST = new Value(List.of());
+  public final static Value EMPTY_OBJECT = new Value(ImmutableSortedMap.of());
 
   // This class is an unsafe wrapper around an arbitrary object.
   // This does box primitives, but we're not trying to micro optimize here.
@@ -139,40 +147,16 @@ public final class Value implements Comparable<Value> {
 
   @Override
   public int compareTo(Value other) {
-    var cmp = this.type().compareTo(other.type());
+    var myType = type();
+    var cmp = myType.compareTo(other.type());
     if (cmp != 0) return cmp;
-    return switch (this.type()) {
+    return switch (myType) {
       case Null -> 0;
-      case Boolean -> Boolean.compare(this.asBoolean(), other.asBoolean());
-      case Number -> {
-        var a = this.asDouble();
-        var b = other.asDouble();
-        yield TotalOrderDoubleComparator.INSTANCE.compareDouble(a, b);
-      }
+      case Boolean -> Boolean.compare(asBoolean(), other.asBoolean());
+      case Number -> TotalOrderDoubleComparator.INSTANCE.compareDouble(asDouble(), other.asDouble());
       case String -> CodepointComparator.INSTANCE.compare(asString(), other.asString());
-      case List -> {
-        var a = asList();
-        var b = other.asList();
-        var minSize = Math.min(a.size(), b.size());
-        for (int i = 0; i < minSize; i++) {
-          cmp = a.get(i).compareTo(b.get(i));
-          if (cmp != 0) yield cmp;
-        }
-        yield Integer.compare(a.size(), b.size());
-      }
-      case Object -> {
-        var a = asObject().entrySet().iterator();
-        var b = other.asObject().entrySet().iterator();
-        while (a.hasNext() && b.hasNext()) {
-          var aEntry = a.next();
-          var bEntry = b.next();
-          cmp = aEntry.getKey().compareTo(bEntry.getKey());
-          if (cmp != 0) yield cmp;
-          cmp = aEntry.getValue().compareTo(bEntry.getValue());
-          if (cmp != 0) yield cmp;
-        }
-        yield Boolean.compare(a.hasNext(), b.hasNext());
-      }
+      case List -> LexicographicalComparator.<Value>naturalOrder().compare(asList(), other.asList());
+      case Object -> OBJECT_COMPARATOR.compare(asObject().entrySet(), other.asObject().entrySet());
     };
   }
 
