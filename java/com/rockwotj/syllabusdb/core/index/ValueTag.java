@@ -2,7 +2,7 @@ package com.rockwotj.syllabusdb.core.index;
 
 import com.google.common.primitives.UnsignedBytes;
 
-/** */
+/** A byte marker used to distinguish between types when the type isn't known in advance. */
 enum ValueTag {
   NULL(0x1),
   FALSE(0x2),

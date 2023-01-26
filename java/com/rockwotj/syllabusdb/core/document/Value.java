@@ -13,6 +13,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+/**
+ * A value within a JSON document.
+ *
+ * <p>Values can have 6 different types: - null - boolean - number (which while the JSON spec is not
+ * specific about these we'll assume they are doubles) - strings - lists - objects (essentially
+ * nested JSON documents).
+ */
 @Immutable
 public final class Value implements Comparable<Value> {
 
@@ -22,6 +29,9 @@ public final class Value implements Comparable<Value> {
   public static Value NAN = new Value(Double.NaN);
   public static Value EMPTY_LIST = new Value(List.of());
   public static Value EMPTY_OBJECT = new Value(ImmutableSortedMap.of());
+
+  // This class is an unsafe wrapper around an arbitrary object.
+  // This does box primitives, but we're not trying to micro optimize here.
   private final @Nullable Object data;
 
   private Value(@Nullable Object data) {

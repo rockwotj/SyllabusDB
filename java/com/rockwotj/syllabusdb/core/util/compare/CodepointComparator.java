@@ -2,7 +2,14 @@ package com.rockwotj.syllabusdb.core.util.compare;
 
 import java.util.Comparator;
 
-/** Compare by codepoints not UTF-16 characters */
+/**
+ * The JVM works in UTF-16 codepoints, which doesn't always give you the same sort order as UTF-32
+ * (AKA raw codepoints).
+ *
+ * <p>See: https://icu-project.org/docs/papers/utf16_code_point_order.html
+ *
+ * <p>This comparator uses codepoints directly to compare for the correct ordering.
+ */
 public final class CodepointComparator implements Comparator<String> {
   public static CodepointComparator INSTANCE = new CodepointComparator();
 

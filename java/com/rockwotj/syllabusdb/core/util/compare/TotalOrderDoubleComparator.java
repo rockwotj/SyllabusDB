@@ -12,6 +12,7 @@ public final class TotalOrderDoubleComparator implements Comparator<Double> {
     var aNaN = Double.isNaN(a);
     var bNaN = Double.isNaN(b);
     if (aNaN || bNaN) {
+      // NaNs should come first.
       return -Boolean.compare(aNaN, bNaN);
     } else {
       return Double.compare(a, b);

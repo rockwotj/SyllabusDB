@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.rockwotj.syllabusdb.core.bytes.ByteArray;
 import com.rockwotj.syllabusdb.core.document.Value;
 import com.rockwotj.syllabusdb.core.document.testdata.Values;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import org.junit.Test;

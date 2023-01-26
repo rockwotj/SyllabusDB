@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import javax.annotation.Nonnull;
 
-/** */
+/**
+ * A decoder that can read values produced by `IndexEncoder`. There is no API provided to guess in
+ * advance how the values where encoded. The schema must be known in advance and stored elsewhere.
+ */
 public final class IndexDecoder {
   private static final int EOF_MARKER = -1;
   private static final int MIN_VALUE_MARKER = Integer.MIN_VALUE;
@@ -64,6 +67,13 @@ public final class IndexDecoder {
   }
 
   public abstract class Directional {
+    // For the recursive values such as lists and objects, we need to peek at the next byte to
+    // determine if
+    // we've reached the end or not. Writing the length at the beginning of values would ruin our
+    // sort order
+    // by sorting everything by length, then lexicographically. We're forced to lookahead instead
+    // and then
+    // "reuse" that value if needed to parse subvalues.
     private int peek;
 
     private Directional() {}
@@ -86,14 +96,14 @@ public final class IndexDecoder {
         case STRING -> Value.of(readString());
         case LIST -> {
           var list = new ArrayList<Value>();
-          while ((peek = readByte()) != MIN_VALUE_MARKER) {
+          while ((peek = readByte()) != separatorMarker()) {
             list.add(readValueInternal());
           }
           yield Value.of(list);
         }
         case OBJECT -> {
           var object = new TreeMap<FieldName, Value>();
-          while ((peek = readByte()) != MIN_VALUE_MARKER) {
+          while ((peek = readByte()) != separatorMarker()) {
             // Seed readString() with the value we just read
             buffer.write(peek);
             var name = new FieldName(readString());
@@ -108,7 +118,7 @@ public final class IndexDecoder {
 
     public String readString() throws IOException {
       int b;
-      while ((b = readByte()) != MIN_VALUE_MARKER) {
+      while ((b = readByte()) != separatorMarker()) {
         buffer.write(UnsignedBytes.checkedCast(b));
       }
       var str = buffer.toString(StandardCharsets.UTF_8);
@@ -117,6 +127,8 @@ public final class IndexDecoder {
     }
 
     private Double readDouble() throws IOException {
+      // See IndexEncoder.Directional.writeDouble for a full explaination of the encoding format.
+      // We apply the reverse operation here to get back to our original double.
       var raw =
           Longs.fromBytes(
               readByteChecked(),
@@ -136,7 +148,7 @@ public final class IndexDecoder {
       return Double.longBitsToDouble(raw);
     }
 
-    /** Read a non-special byte. */
+    /** Assert we're reading a non-special byte (EOF, MIN, MAX). */
     private byte readByteChecked() throws IOException {
       return UnsignedBytes.checkedCast(readByte());
     }
@@ -169,8 +181,8 @@ public final class IndexDecoder {
       var r = readAscByte();
       return switch (r) {
         case EOF_MARKER -> EOF_MARKER;
-        case MAX_VALUE_MARKER -> MIN_VALUE_MARKER;
-        case MIN_VALUE_MARKER -> MAX_VALUE_MARKER;
+        case MAX_VALUE_MARKER -> MAX_VALUE_MARKER;
+        case MIN_VALUE_MARKER -> MIN_VALUE_MARKER;
         default -> ~r & 0xFF;
       };
     }

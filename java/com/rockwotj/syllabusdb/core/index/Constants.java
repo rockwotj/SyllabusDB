@@ -1,5 +1,26 @@
 package com.rockwotj.syllabusdb.core.index;
 
+/**
+ * Our index format requires the ability to write bytes, as well as additional sentinel MIN/MAX
+ * values that come before/after all other bytes.
+ *
+ * <p>In order to do this we need at least 258 symbols. To do this each byte 0x01 - 0xFE is mapped
+ * to itself. This leaves us with four symbols left: 0x00, 0xFF, MIN_VALUE, MAX_VALUE. We encode
+ * them as the following sequences:
+ *
+ * <p>MIN_VALUE -> 0x00 0x00 0x00 -> 0x00 0xFF 0xFF -> 0xFF 0x01 MAX_VALUE -> 0xFF 0xFF
+ *
+ * <p>There are more 2 byte sequences we could encode with the 0x00 and 0xFF prefixes, but those
+ * slots are unused.
+ *
+ * <p>This is essentially the exact same encoding used as OrderedCode. The implementation of which
+ * is open sourced from Google under an Apache 2.0 License.
+ *
+ * <p>See the following for the original implementation in C++
+ *
+ * <p>https://github.com/firebase/firebase-ios-sdk/blob/4171a3b5/Firestore/core/src/util/ordered_code.h
+ * https://github.com/firebase/firebase-ios-sdk/blob/4171a3b5/Firestore/core/src/util/ordered_code.cc
+ */
 final class Constants {
 
   public static final byte MAX_UNSIGNED_BYTE = -1;

@@ -12,7 +12,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
-/** An immutable view of a byte array, with expected equality and comparison semantics. */
+/**
+ * An immutable view of a byte array, with proper hashing & equality. Provides unsigned comparison
+ * semantics.
+ */
 @Immutable
 public final class ByteArray implements Comparable<ByteArray> {
   @Nonnull private final byte[] bytes;

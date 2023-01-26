@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/** A converter to/from serialized JSON from our in memory models for a JSON object. */
 public final class DocConverter {
   private static final Gson gson;
 

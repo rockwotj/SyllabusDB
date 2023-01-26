@@ -5,7 +5,11 @@ import com.rockwotj.syllabusdb.core.bytes.ByteArray;
 import com.rockwotj.syllabusdb.core.document.Value;
 import java.nio.charset.StandardCharsets;
 
-/** */
+/**
+ * A class to create ordered keys of values for our KV Store. The encoding here does not prescribe a
+ * schema - this must be enforced by the caller. Ascending and descending values can be freely
+ * mixed.
+ */
 public final class IndexEncoder {
 
   private final ByteArray.Output output = ByteArray.newOutput();
@@ -28,6 +32,9 @@ public final class IndexEncoder {
     return output.toByteArray();
   }
 
+  /**
+   * Write byte `b` in ascending order such that it respects the various escapes for 0x00 and 0xFF.
+   */
   private void writeAscByte(byte b) {
     if (b == 0x0) {
       output.write(Constants.ESCAPED_NULL);
@@ -38,10 +45,14 @@ public final class IndexEncoder {
     }
   }
 
-  public abstract class Directional {
-
+  /**
+   * An abstract directional index encoder. It can write values such that they are sorted in either
+   * ascendin or descending order depending on the implementation.
+   */
+  public abstract static class Directional {
     private Directional() {}
 
+    /** Write `v` in the corresponding direction. */
     public void writeValue(Value v) {
       switch (v.type()) {
         case Null -> writeTag(ValueTag.NULL);
@@ -82,7 +93,11 @@ public final class IndexEncoder {
       }
     }
 
+    /** Write `s` in corresponding direction in codepoint order. */
     public void writeString(String s) {
+      // UTF-8 preserves the ordering of individual codepoints.
+      // Some interesting and recommended reading on UTF-8:
+      // https://www.cl.cam.ac.uk/~mgk25/ucs/utf-8-history.txt
       var bytes = s.getBytes(StandardCharsets.UTF_8);
       for (byte b : bytes) {
         writeByte(b);
@@ -91,7 +106,24 @@ public final class IndexEncoder {
     }
 
     private void writeDouble(double d) {
+      // This is the encoding of IEEE 754 double precision floating point numbers. The encoding for
+      // doubles is the same,
+      // but with more bits. To encode doubles into a total order from smallest to largest (we
+      // assume NANs are
+      // handled elsewhere) we need to always invert the sign bit so that negative values come
+      // first.
       //
+      // After that the order of the bytes are in ascending order corresponding with larger values
+      // (ignoring the sign
+      // bit) going last. This is what we want for positive numbers, but for negative numbers we
+      // need to invert the
+      // bits so that the larger absolute value'd numbers come first as negative values further from
+      // zero should sort
+      // first.
+      //
+      // The following table gives some common numbers and their binary format, which hopefully
+      // helps for understanding
+      // of the encoding.
       // ┌─────────┬──────┬──────────┬─────────────────────────┐
       // │ Number  │ Sign │ Exponent │       Significand       │
       // ├─────────┼──────┼──────────┼─────────────────────────┤
@@ -104,24 +136,23 @@ public final class IndexEncoder {
       // │ -inf    │    1 │ 11111111 │ 00000000000000000000000 │
       // │ NaN     │    0 │ 11111111 │ 10000000000000000000001 │
       // └─────────┴──────┴──────────┴─────────────────────────┘
-      // {value=4.9E-324,
-      // encoded=0b00000101_00000001_00000000_00000000_00000000_00000000_00000000_00000000_10000000}
-      // {value=2.2250738585072014E-308,
-      // encoded=0b00000101_00000000_00000000_00000000_00000000_00000000_00000000_00010000_10000000}
+      //
+      // Now for some JVM specifics - we need to get the raw bits of the double, so convert it to a
+      // long.
       var raw = Double.doubleToRawLongBits(d);
+      // signum allows us to check the leading bit to see if it's negative.
       if (Long.signum(raw) == -1) {
-        // This is a negative number,
-        // we need to invert the sign bit to make negatives
-        // come first, then the rest of the bits to get a
-        // ascending order instead of a descending one
+        // This is a negative number, we need to invert the sign bit, exponent and significand,
+        // which means invert all
+        // the bits.
         raw = ~raw;
       } else {
-        // This is 0 or a positive number
-        // we need to flip the sign bit and that's it
-        // (so that it comes after negatives)
+        // A positive number - we only need to flip the sign bit, so XOR just the sign bit to invert
+        // it.
         raw ^= 0x8000_0000_0000_0000L;
       }
-      // Write in big endian form
+      // Write in big endian form, but by using writeByte we ensure it's still written in the
+      // correct {asc,desc} direction.
       for (int i = Long.SIZE - Byte.SIZE; i >= 0; i -= Byte.SIZE) {
         writeByte((byte) ((raw >> i) & 0xFF));
       }
@@ -136,6 +167,10 @@ public final class IndexEncoder {
     protected abstract void writeSeparator();
   }
 
+  /**
+   * An encoder that writes values in ascending order. Separators are the MIN value so that
+   * smaller/shorter values always come before.
+   */
   public class Asc extends Directional {
     @Override
     protected void writeByte(byte b) {
@@ -148,9 +183,14 @@ public final class IndexEncoder {
     }
   }
 
+  /**
+   * An encoder that writes values in descending order. Separators are the MAX value so that
+   * smaller/shorter values always come after.
+   */
   public class Desc extends Directional {
     @Override
     protected void writeByte(byte b) {
+      // Invert the bytes to reverse the sort order.
       writeAscByte((byte) (~b & 0xFF));
     }
 
