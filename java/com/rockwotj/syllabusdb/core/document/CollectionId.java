@@ -7,7 +7,7 @@ public record CollectionId(@Nonnull String raw) {
   private static final Pattern VALID_ID_REGEX = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*$");
 
   public CollectionId {
-    if (!VALID_ID_REGEX.matcher(raw).matches()) {
+    if (raw == null || !VALID_ID_REGEX.matcher(raw).matches()) {
       throw new IllegalArgumentException("Invalid collection ID: " + raw);
     }
   }

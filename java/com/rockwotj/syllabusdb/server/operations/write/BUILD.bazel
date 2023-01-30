@@ -5,13 +5,12 @@ package(
 )
 
 java_library(
-    name = "index",
+    name = "write",
     srcs = glob(
         ["*.java"],
         exclude = ["*Test.java"],
     ),
     deps = [
-        "//java/com/rockwotj/syllabusdb/core/document",
         "@maven//:com_google_code_findbugs_jsr305",
     ],
 )

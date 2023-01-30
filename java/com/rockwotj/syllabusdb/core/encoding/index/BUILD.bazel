@@ -11,7 +11,9 @@ java_library(
         exclude = ["*Test.java"],
     ),
     deps = [
-        "//java/com/rockwotj/syllabusdb/core/document",
+        "//java/com/rockwotj/syllabusdb/core/bytes",
+        "//java/com/rockwotj/syllabusdb/core/encoding/value",
+        "//java/com/rockwotj/syllabusdb/core/index",
         "@maven//:com_google_code_findbugs_jsr305",
     ],
 )

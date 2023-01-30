@@ -1,15 +1,12 @@
 package com.rockwotj.syllabusdb.core.util.compare;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.Comparator;
 
-/**
- * Compare 2 lists lexicographically.
- */
+/** Compare 2 lists lexicographically. */
 public final class LexicographicalComparator<T> implements Comparator<Iterable<T>> {
 
   private static final LexicographicalComparator<Comparable<Object>> NATURAL_ORDER_INSTANCE =
-          new LexicographicalComparator<Comparable<Object>>(Comparator.naturalOrder());
+      new LexicographicalComparator<Comparable<Object>>(Comparator.naturalOrder());
 
   public static <T extends Comparable<? super T>> Comparator<Iterable<T>> naturalOrder() {
     return (LexicographicalComparator<T>) NATURAL_ORDER_INSTANCE;

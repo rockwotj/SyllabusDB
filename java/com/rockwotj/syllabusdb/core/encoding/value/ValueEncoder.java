@@ -1,4 +1,4 @@
-package com.rockwotj.syllabusdb.core.index;
+package com.rockwotj.syllabusdb.core.encoding.value;
 
 import com.google.common.primitives.UnsignedBytes;
 import com.rockwotj.syllabusdb.core.bytes.ByteArray;
@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
  * schema - this must be enforced by the caller. Ascending and descending values can be freely
  * mixed.
  */
-public final class IndexEncoder {
+public final class ValueEncoder {
 
   private final ByteArray.Output output = ByteArray.newOutput();
   private final Asc asc = new Asc();
@@ -106,24 +106,18 @@ public final class IndexEncoder {
     }
 
     private void writeDouble(double d) {
-      // This is the encoding of IEEE 754 double precision floating point numbers. The encoding for
-      // doubles is the same,
-      // but with more bits. To encode doubles into a total order from smallest to largest (we
-      // assume NANs are
-      // handled elsewhere) we need to always invert the sign bit so that negative values come
-      // first.
+      // This is the encoding of IEEE 754 single precision floating point numbers. The encoding for
+      // doubles is the same, but with more bits. To encode doubles into a total order from smallest
+      // to largest (we assume NANs are handled elsewhere) we need to always invert the sign bit so
+      // that negative values come first.
       //
       // After that the order of the bytes are in ascending order corresponding with larger values
-      // (ignoring the sign
-      // bit) going last. This is what we want for positive numbers, but for negative numbers we
-      // need to invert the
-      // bits so that the larger absolute value'd numbers come first as negative values further from
-      // zero should sort
-      // first.
+      // (ignoring the sign bit) going last. This is what we want for positive numbers, but for
+      // negative numbers we need to invert the bits so that the larger absolute value'd numbers
+      // come first as negative values further from zero should sort first.
       //
       // The following table gives some common numbers and their binary format, which hopefully
-      // helps for understanding
-      // of the encoding.
+      // helps for understanding of the encoding.
       // ┌─────────┬──────┬──────────┬─────────────────────────┐
       // │ Number  │ Sign │ Exponent │       Significand       │
       // ├─────────┼──────┼──────────┼─────────────────────────┤
@@ -143,8 +137,7 @@ public final class IndexEncoder {
       // signum allows us to check the leading bit to see if it's negative.
       if (Long.signum(raw) == -1) {
         // This is a negative number, we need to invert the sign bit, exponent and significand,
-        // which means invert all
-        // the bits.
+        // which means invert all the bits.
         raw = ~raw;
       } else {
         // A positive number - we only need to flip the sign bit, so XOR just the sign bit to invert

@@ -1,4 +1,4 @@
-package com.rockwotj.syllabusdb.core.index;
+package com.rockwotj.syllabusdb.core.encoding.value;
 
 /**
  * Our index format requires the ability to write bytes, as well as additional sentinel MIN/MAX

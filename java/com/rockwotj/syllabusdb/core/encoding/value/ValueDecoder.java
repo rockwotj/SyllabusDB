@@ -1,6 +1,6 @@
-package com.rockwotj.syllabusdb.core.index;
+package com.rockwotj.syllabusdb.core.encoding.value;
 
-import static com.rockwotj.syllabusdb.core.index.Constants.MAX_UNSIGNED_BYTE;
+import static com.rockwotj.syllabusdb.core.encoding.value.Constants.MAX_UNSIGNED_BYTE;
 
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
  * A decoder that can read values produced by `IndexEncoder`. There is no API provided to guess in
  * advance how the values where encoded. The schema must be known in advance and stored elsewhere.
  */
-public final class IndexDecoder {
+public final class ValueDecoder {
   private static final int EOF_MARKER = -1;
   private static final int MIN_VALUE_MARKER = Integer.MIN_VALUE;
   private static final int MAX_VALUE_MARKER = Integer.MAX_VALUE;
@@ -27,7 +27,7 @@ public final class IndexDecoder {
   private final Desc desc = new Desc();
   private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-  public IndexDecoder(InputStream stream) {
+  public ValueDecoder(InputStream stream) {
     this.stream = stream;
   }
 
@@ -68,12 +68,9 @@ public final class IndexDecoder {
 
   public abstract class Directional {
     // For the recursive values such as lists and objects, we need to peek at the next byte to
-    // determine if
-    // we've reached the end or not. Writing the length at the beginning of values would ruin our
-    // sort order
-    // by sorting everything by length, then lexicographically. We're forced to lookahead instead
-    // and then
-    // "reuse" that value if needed to parse subvalues.
+    // determine if we've reached the end or not. Writing the length at the beginning of values
+    // would ruin our sort order by sorting everything by length, then lexicographically. We're
+    // forced to lookahead instead and then "reuse" that value if needed to parse subvalues.
     private int peek;
 
     private Directional() {}

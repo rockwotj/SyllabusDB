@@ -9,7 +9,7 @@ public record FieldName(@Nonnull String raw) implements Comparable<FieldName> {
   private static final Pattern VALID_ID_REGEX = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*$");
 
   public FieldName {
-    if (!VALID_ID_REGEX.matcher(raw).matches()) {
+    if (raw == null || !VALID_ID_REGEX.matcher(raw).matches()) {
       throw new IllegalArgumentException("Invalid field name: " + raw);
     }
   }

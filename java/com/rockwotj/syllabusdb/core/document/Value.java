@@ -19,24 +19,30 @@ import javax.annotation.concurrent.Immutable;
 /**
  * A value within a JSON document.
  *
- * <p>Values can have 6 different types: - null - boolean - number (which while the JSON spec is not
- * specific about these we'll assume they are doubles) - strings - lists - objects (essentially
- * nested JSON documents).
+ * <p>Values can have 6 different types:
+ *
+ * <ul>
+ *   <li>- null
+ *   <li>- boolean
+ *   <li>- number (which while the JSON spec is not specific about these we'll assume they are
+ *       doubles)
+ *   <li>- strings
+ *   <li>- lists
+ *   <li>- objects (essentially nested JSON documents)
  */
 @Immutable
 public final class Value implements Comparable<Value> {
 
-  private final static Comparator<Iterable<Map.Entry<FieldName, Value>>> OBJECT_COMPARATOR =
-          LexicographicalComparator.create(
-                  Map.Entry.<FieldName, Value>comparingByKey().thenComparing(Map.Entry.comparingByValue())
-          );
+  private static final Comparator<Iterable<Map.Entry<FieldName, Value>>> OBJECT_COMPARATOR =
+      LexicographicalComparator.create(
+          Map.Entry.<FieldName, Value>comparingByKey().thenComparing(Map.Entry.comparingByValue()));
 
-  public final static Value NULL = new Value(null);
-  public final static Value FALSE = new Value(Boolean.FALSE);
-  public final static Value TRUE = new Value(Boolean.TRUE);
-  public final static Value NAN = new Value(Double.NaN);
-  public final static Value EMPTY_LIST = new Value(List.of());
-  public final static Value EMPTY_OBJECT = new Value(ImmutableSortedMap.of());
+  public static final Value NULL = new Value(null);
+  public static final Value FALSE = new Value(Boolean.FALSE);
+  public static final Value TRUE = new Value(Boolean.TRUE);
+  public static final Value NAN = new Value(Double.NaN);
+  public static final Value EMPTY_LIST = new Value(List.of());
+  public static final Value EMPTY_OBJECT = new Value(ImmutableSortedMap.of());
 
   // This class is an unsafe wrapper around an arbitrary object.
   // This does box primitives, but we're not trying to micro optimize here.
@@ -153,9 +159,11 @@ public final class Value implements Comparable<Value> {
     return switch (myType) {
       case Null -> 0;
       case Boolean -> Boolean.compare(asBoolean(), other.asBoolean());
-      case Number -> TotalOrderDoubleComparator.INSTANCE.compareDouble(asDouble(), other.asDouble());
+      case Number -> TotalOrderDoubleComparator.INSTANCE.compareDouble(
+          asDouble(), other.asDouble());
       case String -> CodepointComparator.INSTANCE.compare(asString(), other.asString());
-      case List -> LexicographicalComparator.<Value>naturalOrder().compare(asList(), other.asList());
+      case List -> LexicographicalComparator.<Value>naturalOrder()
+          .compare(asList(), other.asList());
       case Object -> OBJECT_COMPARATOR.compare(asObject().entrySet(), other.asObject().entrySet());
     };
   }

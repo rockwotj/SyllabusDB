@@ -1,10 +1,9 @@
 package com.rockwotj.syllabusdb.core.document;
 
 import com.rockwotj.syllabusdb.core.util.compare.LexicographicalComparator;
-
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /** A path to a value within a document. */
 public record FieldPath(@Nonnull List<FieldName> segments) implements Comparable<FieldPath> {
@@ -17,6 +16,7 @@ public record FieldPath(@Nonnull List<FieldName> segments) implements Comparable
     if (segments.isEmpty()) {
       throw new IllegalArgumentException("Invalid empty field path");
     }
+    segments = List.copyOf(segments);
   }
 
   @Override
@@ -26,6 +26,7 @@ public record FieldPath(@Nonnull List<FieldName> segments) implements Comparable
 
   @Override
   public int compareTo(FieldPath other) {
-    return LexicographicalComparator.<FieldName>naturalOrder().compare(this.segments, other.segments);
+    return LexicographicalComparator.<FieldName>naturalOrder()
+        .compare(this.segments, other.segments);
   }
 }

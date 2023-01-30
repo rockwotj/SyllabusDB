@@ -1,4 +1,4 @@
-package com.rockwotj.syllabusdb.core.index;
+package com.rockwotj.syllabusdb.core.encoding.value;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class IndexTest {
+public class ValueTest {
 
   @Test
   public void ascendingByteOrder() {
@@ -36,7 +36,7 @@ public class IndexTest {
   @Test
   public void ascendingRoundTrip() throws IOException {
     for (var v : Values.TOTAL_ORDER) {
-      var decoder = new IndexDecoder(EncodedValue.asc(v).encoded().toInputStream());
+      var decoder = new ValueDecoder(EncodedValue.asc(v).encoded().toInputStream());
       assertThat(decoder.asc().readValue()).isEqualTo(v);
     }
   }
@@ -44,20 +44,20 @@ public class IndexTest {
   @Test
   public void descendingRoundTrip() throws IOException {
     for (var v : Values.TOTAL_ORDER) {
-      var decoder = new IndexDecoder(EncodedValue.desc(v).encoded().toInputStream());
+      var decoder = new ValueDecoder(EncodedValue.desc(v).encoded().toInputStream());
       assertThat(decoder.desc().readValue()).isEqualTo(v);
     }
   }
 
   private record EncodedValue(Value value, ByteArray encoded) implements Comparable<EncodedValue> {
     public static EncodedValue asc(Value value) {
-      var encoder = new IndexEncoder();
+      var encoder = new ValueEncoder();
       encoder.asc().writeValue(value);
       return new EncodedValue(value, encoder.toByteArray());
     }
 
     public static EncodedValue desc(Value value) {
-      var encoder = new IndexEncoder();
+      var encoder = new ValueEncoder();
       encoder.desc().writeValue(value);
       return new EncodedValue(value, encoder.toByteArray());
     }

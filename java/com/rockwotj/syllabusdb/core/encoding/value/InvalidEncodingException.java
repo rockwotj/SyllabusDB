@@ -1,4 +1,4 @@
-package com.rockwotj.syllabusdb.core.index;
+package com.rockwotj.syllabusdb.core.encoding.value;
 
 /**
  * An exception thrown when decoding and we run into an invalid encoding. This situation can happen

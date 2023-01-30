@@ -1,4 +1,4 @@
-package com.rockwotj.syllabusdb.core.index;
+package com.rockwotj.syllabusdb.core.encoding.value;
 
 import com.google.common.primitives.UnsignedBytes;
 
