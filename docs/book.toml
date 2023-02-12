@@ -1,0 +1,5 @@
+[book]
+authors = ["Tyler Rockwood"]
+language = "en"
+multilingual = false
+src = "src"
