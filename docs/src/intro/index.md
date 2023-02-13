@@ -1,3 +1,5 @@
+{{#title SyllabusDB | Introduction}}
+
 # Introduction
 
 

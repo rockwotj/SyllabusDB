@@ -1,1 +1,3 @@
-# Key Value Stores
+{{#title SyllabusDB | KV Store}}
+
+# Key Value Store

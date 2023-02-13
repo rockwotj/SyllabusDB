@@ -1,1 +1,3 @@
+{{#title SyllabusDB | Indexes}}
+
 # Indexes
