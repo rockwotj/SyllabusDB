@@ -1,0 +1,16 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+java_test(
+    name = "UpgradableLockTest",
+    srcs = ["UpgradableLockTest.java"],
+    deps = [
+        "//java/com/rockwotj/syllabusdb/core/util/concurrent",
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
+)
